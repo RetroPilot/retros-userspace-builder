@@ -1,2 +1,2 @@
 deb https://packages.termux.dev/apt/termux-main/ stable main
-deb https://packages.termux.dev/apt/termux-root/ stable main
+deb https://packages-cf.termux.dev/apt/termux-root root stable

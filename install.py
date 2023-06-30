@@ -14,7 +14,7 @@ BASE_URL = 'https://packages.termux.dev/apt/'
 # azcopy --source dists/ --destination https://termuxdist.blob.core.windows.net/dists --recursive --dest-key $(az storage account keys list --account-name termuxdist --output tsv --query "[0].value")
 
 
-DEFAULT_PKG = ['apt', 'bash', 'busybox', 'ca-certificates', 'command-not-found', 'dash', 'dash', 'dpkg', 'gdbm', 'gpgv', 'libandroid-support', 'libbz2', 'libc++', 'libcrypt', 'libcurl', 'libffi', 'libgcrypt', 'libgpg-error', 'liblzma', 'libnghttp2', 'libsqlite', 'ndk-sysroot', 'ncurses', 'ncurses-ui-libs', 'openssl', 'python', 'readline', 'termux-am', 'termux-exec', 'termux-tools', 'qt5-base', 'qt5-declarative', 'libicu', 'swig', 'gettext', 'ripgrep']
+DEFAULT_PKG = ['apt', 'bash', 'busybox', 'ca-certificates', 'command-not-found', 'dash', 'dash', 'dpkg', 'gdbm', 'gpgv', 'libandroid-support', 'libbz2', 'libc++', 'libcrypt', 'libcurl', 'libffi', 'libgcrypt', 'libgpg-error', 'liblzma', 'libnghttp2', 'libsqlite', 'ndk-sysroot', 'ncurses', 'ncurses-ui-libs', 'openssl', 'python', 'python-pip', 'readline', 'termux-am', 'termux-exec', 'termux-tools', 'qt5-base', 'qt5-declarative', 'libicu', 'swig', 'gettext', 'ripgrep']
 
 # The checked-in debs are built using the neos branch on:
 # https://github.com/commaai/termux-packages/tree/neos/
@@ -26,13 +26,14 @@ DEFAULT_PKG = ['apt', 'bash', 'busybox', 'ca-certificates', 'command-not-found',
 
 LOCAL_OVERRIDE_PKG = {
   #'rust': 'rust_1.38.0-4_aarch64.deb',
-  'python': 'python_3.8.5_aarch64.deb',
-  'swig': 'swig_4.0.1-1_aarch64.deb',
+  #'python': 'python_3.8.5_aarch64.deb',
+  #'swig': 'swig_4.0.1-1_aarch64.deb',
   'libicu': 'libicu_65.1-1_aarch64.deb',
-  'gettext': 'gettext_0.20.1-3_aarch64.deb',
-  'ripgrep': 'ripgrep_11.0.2-1_aarch64.deb',
+  #'gettext': 'gettext_0.20.1-3_aarch64.deb',
+  #'ripgrep': 'ripgrep_11.0.2-1_aarch64.deb',
   'qt5-base': 'qt5-base_5.12.8-28_aarch64.deb',
-  'qt5-declarative': 'qt5-declarative_5.12.8-28_aarch64.deb'
+  'qt5-declarative': 'qt5-declarative_5.12.8-28_aarch64.deb',
+  'apt': 'apt_2.7.1-1_aarch64.deb' # patched to remove stupid ass "can't run as root" bullshit only an asshole would add fuck those guys i mean it's my FUCKING OS let me do WHAT I WANT assholes. you know what? this ramble is getting me all sweaty. i'm spiraling. anyway, i fixed that bullshit. at least this isn't the longest single line in the file.
 }
 
 def load_packages():
@@ -204,6 +205,9 @@ if __name__ == "__main__":
         'xz-utils',
         'zlib',
         # 'zlib-dev',
+        'binutils',
+        'binutils-libs',
+        'binutils-bin',
     ]
 
     pkg_deps, pkg_filenames = load_packages()

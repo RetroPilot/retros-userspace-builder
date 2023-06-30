@@ -15,6 +15,12 @@ SET_STAGE=`cat /data/data/com.termux/files/home/.install_progress`
 
 # mount -o remount,rw /system
 
+# setup directory for apt cache
+if [ ! -d "/data/data/com.termux/cache/apt/archives/partial" ]
+then
+  mkdir -p /data/data/com.termux/cache/apt/archives/partial
+fi
+
 # setup the env
 apt-get update
 apt-get install gawk findutils
@@ -36,60 +42,60 @@ cd /tmp/build
 
 if [ $SET_STAGE -lt 1 ]; then
   # -------- GCC
-  mkdir gcc
-  pushd gcc
+  # mkdir gcc
+  # pushd gcc
 
-  BINUTILS=binutils-2.32
-  GCC=gcc-4.7.1
-  PREFIX=/usr
+  # BINUTILS=binutils-2.32
+  # GCC=gcc-4.7.1
+  # PREFIX=/usr
 
-  mkdir src
-  pushd src
-  wget --tries=inf ftp://ftp.gnu.org/gnu/binutils/$BINUTILS.tar.bz2
-  tar -xf $BINUTILS.tar.bz2
-  popd
+  # mkdir src
+  # pushd src
+  # wget --tries=inf ftp://ftp.gnu.org/gnu/binutils/$BINUTILS.tar.bz2
+  # tar -xf $BINUTILS.tar.bz2
+  # popd
   
-  mkdir -p build/$BINUTILS
-  pushd build/$BINUTILS
+  # mkdir -p build/$BINUTILS
+  # pushd build/$BINUTILS
 
-  # hack for binutils
-  sed -i '1s/^/#define __ANDROID_API__ 28\n/' ../../src/$BINUTILS/bfd/bfdio.c
+  # # hack for binutils
+  # sed -i '1s/^/#define __ANDROID_API__ 28\n/' ../../src/$BINUTILS/bfd/bfdio.c
 
-  ../../src/$BINUTILS/configure CPPFLAGS="-D__ANDROID_API__=28" --target=arm-none-eabi \
-    --build=aarch64-unknown-linux-gnu \
-    --prefix=$PREFIX --with-cpu=cortex-m4 \
-    --with-mode=thumb \
-    --disable-nls \
-    --disable-werror
-  make -j4 all
-  make install
-  popd
+  # ../../src/$BINUTILS/configure CPPFLAGS="-D__ANDROID_API__=28" --target=arm-none-eabi \
+  #   --build=aarch64-unknown-linux-gnu \
+  #   --prefix=$PREFIX --with-cpu=cortex-m4 \
+  #   --with-mode=thumb \
+  #   --disable-nls \
+  #   --disable-werror
+  # make -j4 all
+  # make install
+  # popd
 
-  mkdir -p src
-  pushd src
-  wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/$GCC/$GCC.tar.bz2
-  tar -xf $GCC.tar.bz2
-  cd $GCC
-  contrib/download_prerequisites
-  popd
+  # mkdir -p src
+  # pushd src
+  # wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/$GCC/$GCC.tar.bz2
+  # tar -xf $GCC.tar.bz2
+  # cd $GCC
+  # contrib/download_prerequisites
+  # popd
 
-  export PATH="$PREFIX/bin:$PATH"
+  # export PATH="$PREFIX/bin:$PATH"
 
-  mkdir -p build/$GCC
-  pushd build/$GCC
-  ../../src/$GCC/configure --target=arm-none-eabi \
-    --build=aarch64-unknown-linux-gnu \
-    --disable-libssp --disable-gomp --disable-libstcxx-pch --enable-threads \
-    --disable-shared --disable-libmudflap \
-    --prefix=$PREFIX --with-cpu=cortex-m4 \
-    --with-mode=thumb --disable-multilib \
-    --enable-interwork \
-    --enable-languages="c" \
-    --disable-nls \
-    --disable-libgcc
-  make -j4 all-gcc
-  make install-gcc
-  popd
+  # mkdir -p build/$GCC
+  # pushd build/$GCC
+  # ../../src/$GCC/configure --target=arm-none-eabi \
+  #   --build=aarch64-unknown-linux-gnu \
+  #   --disable-libssp --disable-gomp --disable-libstcxx-pch --enable-threads \
+  #   --disable-shared --disable-libmudflap \
+  #   --prefix=$PREFIX --with-cpu=cortex-m4 \
+  #   --with-mode=thumb --disable-multilib \
+  #   --enable-interwork \
+  #   --enable-languages="c" \
+  #   --disable-nls \
+  #   --disable-libgcc
+  # make -j4 all-gcc
+  # make install-gcc
+  # popd
 
   echo "2" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=1
@@ -97,9 +103,9 @@ fi
 
 if [ $SET_STAGE -lt 2 ]; then
   # replace stdint.h with stdint-gcc.h for Android compatibility
-  mv $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint-gcc.h $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint.h
+  # mv $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint-gcc.h $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint.h
 
-  popd
+  # popd
 
   # -------- capnproto
   VERSION=0.8.0
@@ -146,14 +152,15 @@ fi
 
 if [ $SET_STAGE -lt 5 ]; then
   # ------- tcpdump
-  VERSION="4.9.2"
-  wget --tries=inf https://www.tcpdump.org/release/tcpdump-$VERSION.tar.gz
-  tar xvf tcpdump-$VERSION.tar.gz
-  pushd tcpdump-$VERSION
-  ./configure --prefix=/usr
-  make -j4
-  make install
-  popd
+  # VERSION="4.9.2"
+  # wget --tries=inf https://www.tcpdump.org/release/tcpdump-$VERSION.tar.gz
+  # tar xvf tcpdump-$VERSION.tar.gz
+  # pushd tcpdump-$VERSION
+  # ./configure --prefix=/usr
+  # make -j4
+  # make install
+  # popd
+  apt install tcpdump
   echo "6" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=5
 fi
@@ -188,7 +195,7 @@ if [ $SET_STAGE -lt 8 ]; then
   # ------- python packages
   cd $HOME
   export PYCURL_SSL_LIBRARY=openssl
-  pip install --no-cache-dir --upgrade pip
+  # pip install --no-cache-dir --upgrade pip
   pip install --no-cache-dir pipenv
   pipenv install --deploy --system --verbose --clear
   echo "9" > /data/data/com.termux/files/home/.install_progress

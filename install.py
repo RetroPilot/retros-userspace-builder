@@ -7,14 +7,14 @@ import tempfile
 import shutil
 
 #BASE_URL = 'http://termux.net/'
-BASE_URL = 'http://termux.comma.ai/'
+BASE_URL = 'https://packages.termux.dev/apt/'
 
 # Create mirror using
 # lftp -c "mirror --use-pget-n=10 --verbose http://termux.net"
 # azcopy --source dists/ --destination https://termuxdist.blob.core.windows.net/dists --recursive --dest-key $(az storage account keys list --account-name termuxdist --output tsv --query "[0].value")
 
 
-DEFAULT_PKG = ['apt', 'bash', 'busybox', 'ca-certificates', 'command-not-found', 'dash', 'dash', 'dpkg', 'gdbm', 'gpgv', 'libandroid-support', 'libbz2', 'libc++', 'libcrypt', 'libcrypt-dev', 'libcurl', 'libffi', 'libgcrypt', 'libgpg-error', 'liblzma', 'libnghttp2', 'libsqlite', 'libutil', 'ncurses', 'ncurses-ui-libs', 'openssl', 'python', 'readline', 'termux-am', 'termux-exec', 'termux-tools', 'qt5-base', 'qt5-declarative', 'libicu', 'swig', 'gettext', 'ripgrep']
+DEFAULT_PKG = ['apt', 'bash', 'busybox', 'ca-certificates', 'command-not-found', 'dash', 'dash', 'dpkg', 'gdbm', 'gpgv', 'libandroid-support', 'libbz2', 'libc++', 'libcrypt', 'libcurl', 'libffi', 'libgcrypt', 'libgpg-error', 'liblzma', 'libnghttp2', 'libsqlite', 'ndk-sysroot', 'ncurses', 'ncurses-ui-libs', 'openssl', 'python', 'readline', 'termux-am', 'termux-exec', 'termux-tools', 'qt5-base', 'qt5-declarative', 'libicu', 'swig', 'gettext', 'ripgrep']
 
 # The checked-in debs are built using the neos branch on:
 # https://github.com/commaai/termux-packages/tree/neos/
@@ -39,8 +39,8 @@ def load_packages():
     pkg_deps = {}
     pkg_filenames = {}
 
-    r = requests.get(BASE_URL + 'dists/stable/main/binary-aarch64/Packages').text
-    r += requests.get(BASE_URL + 'dists/stable/main/binary-all/Packages').text
+    r = requests.get(BASE_URL + 'termux-root/dists/stable/main/binary-aarch64/Packages').text
+    r2 = requests.get(BASE_URL + 'termux-main/dists/stable/main/binary-aarch64/Packages').text
     print(BASE_URL + 'dists/stable/main/binary-aarch64/Packages')
 
     for l in r.split('\n'):
@@ -56,7 +56,23 @@ def load_packages():
         elif l.startswith('Filename: '):
             pkg_filename = l.split(': ')[1]
             pkg_deps[pkg_name] = pkg_depends
-            pkg_filenames[pkg_name] = pkg_filename
+            pkg_filenames[pkg_name] = "termux-root/"+pkg_filename
+
+    for l in r2.split('\n'):
+        if l.startswith("Package:"):
+            pkg_name = l.split(': ')[1]
+            pkg_depends = []
+        elif l.startswith('Depends: '):
+            pkg_depends = l.split(': ')[1].split(',')
+            pkg_depends = [p.replace(' ', '') for p in pkg_depends]
+            pkg_depends = [p.replace('|dropbear','') for p in pkg_depends]
+
+            # strip version (eg. gnupg (>= 2.2.9-1))
+            pkg_depends = [p.split('(')[0] for p in pkg_depends]
+        elif l.startswith('Filename: '):
+            pkg_filename = l.split(': ')[1]
+            pkg_deps[pkg_name] = pkg_depends
+            pkg_filenames[pkg_name] = "termux-main/"+pkg_filename
     return pkg_deps, pkg_filenames
 
 
@@ -145,33 +161,37 @@ if __name__ == "__main__":
         'coreutils',
         'curl',
         'ffmpeg',
-        'ffmpeg-dev',
         'flex',
         'gdb',
         'git',
         'git-lfs',
         'htop',
         'jq',
-        'libcurl-dev',
-        'libffi-dev',
+        'libcurl',
+        # 'libcurl-dev',
+        'libffi',
+        # 'libffi-dev',
         'libjpeg-turbo',
-        'libjpeg-turbo-dev',
+        # 'libjpeg-turbo-dev',
         'liblz4',
-        'liblz4-dev',
+        # 'liblz4-dev',
         'liblzo',
-        'liblzo-dev',
+        # 'liblzo-dev',
         'libmpc',
         'libtool',
-        'libuuid-dev',
+        'libuuid',
+        # 'libuuid-dev',
         #'libzmq',
         'libpcap',
-        'libpcap-dev',
+        # 'libpcap-dev',
         'make',
         'man',
         'nano',
-        'ncurses-dev',
+        'ncurses',
+        # 'ncurses-dev',
         'openssh',
-        'openssl-dev',
+        'openssl',
+        # 'openssl-dev',
         'openssl-tool',
         'patchelf',
         'pkg-config',
@@ -182,7 +202,8 @@ if __name__ == "__main__":
         'vim',
         'wget',
         'xz-utils',
-        'zlib-dev',
+        'zlib',
+        # 'zlib-dev',
     ]
 
     pkg_deps, pkg_filenames = load_packages()

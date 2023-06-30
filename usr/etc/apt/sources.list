@@ -1,1 +1,2 @@
-deb http://termux.comma.ai stable main
+deb https://packages.termux.dev/apt/termux-main/ stable main
+deb https://packages.termux.dev/apt/termux-root/ stable main

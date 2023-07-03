@@ -21,6 +21,9 @@ then
   mkdir -p /data/data/com.termux/cache/apt/archives/partial
 fi
 
+# prevent apt from updating
+echo "apt hold" | dpkg --set-selections
+
 # setup the env
 apt-get update
 apt-get install gawk findutils
@@ -41,6 +44,11 @@ mkdir /tmp/build
 cd /tmp/build
 
 if [ $SET_STAGE -lt 1 ]; then
+
+  # new apt stuff
+  # tur repo
+  apt install -y tur-repo
+
   # -------- GCC
   # mkdir gcc
   # pushd gcc
@@ -97,6 +105,9 @@ if [ $SET_STAGE -lt 1 ]; then
   # make install-gcc
   # popd
 
+  apt install -y gcc-9
+  apt install -y binutils
+
   echo "2" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=1
 fi
@@ -108,16 +119,17 @@ if [ $SET_STAGE -lt 2 ]; then
   # popd
 
   # -------- capnproto
-  VERSION=0.8.0
+  # VERSION=0.8.0
 
-  wget --tries=inf https://capnproto.org/capnproto-c++-${VERSION}.tar.gz
-  tar xvf capnproto-c++-${VERSION}.tar.gz
+  # wget --tries=inf https://capnproto.org/capnproto-c++-${VERSION}.tar.gz
+  # tar xvf capnproto-c++-${VERSION}.tar.gz
 
-  pushd capnproto-c++-${VERSION}
+  # pushd capnproto-c++-${VERSION}
 
-  CXXFLAGS="-fPIC -O2" ./configure --prefix=/usr
-  make -j4 install
-  popd
+  # CXXFLAGS="-fPIC -O2" ./configure --prefix=/usr
+  # make -j4 install
+  # popd
+  apt install capnproto
   echo "3" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=2
 fi
@@ -196,8 +208,11 @@ if [ $SET_STAGE -lt 8 ]; then
   cd $HOME
   export PYCURL_SSL_LIBRARY=openssl
   # pip install --no-cache-dir --upgrade pip
-  pip install --no-cache-dir pipenv
-  pipenv install --deploy --system --verbose --clear
+  # pip install --no-cache-dir pipenv
+  # pipenv install --deploy --system --verbose --clear
+  # numpy and scipy
+  apt install -y python-numpy python-scipy
+  pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=8
 fi

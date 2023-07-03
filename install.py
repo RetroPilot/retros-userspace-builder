@@ -28,7 +28,7 @@ LOCAL_OVERRIDE_PKG = {
   #'rust': 'rust_1.38.0-4_aarch64.deb',
   #'python': 'python_3.8.5_aarch64.deb',
   #'swig': 'swig_4.0.1-1_aarch64.deb',
-  'libicu': 'libicu_65.1-1_aarch64.deb',
+  #'libicu': 'libicu_65.1-1_aarch64.deb',
   #'gettext': 'gettext_0.20.1-3_aarch64.deb',
   #'ripgrep': 'ripgrep_11.0.2-1_aarch64.deb',
   'qt5-base': 'qt5-base_5.12.8-28_aarch64.deb',

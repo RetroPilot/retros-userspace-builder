@@ -9,7 +9,9 @@ cd  retros-userspace-builder
 ./finish.sh
 ```
 ## Testing
-Use either a rooted Android 9 device or a RetrOS device. For Android devices not running Retros, install termux but don't open it.
+### **ONLY TESTED WITH LINEAGE 18.1**
+
+Use either a rooted Android 11 device or a RetrOS device. For Android devices not running Retros, install termux but don't open it.
 
 Push the userland to the phone with adb and extract it
 ```
@@ -24,6 +26,13 @@ For non-RetrOS devices, also run:
 
 ```
 mount -o remount,rw /dev/root /
+```
+or
+```
+mount -o remount,rw /
+```
+then
+```
 ln -s /data/data/com.termux/files/usr /usr
 mkdir -p /tmp && mount -t tmpfs -o size=2048M tmpfs /tmp
 ```

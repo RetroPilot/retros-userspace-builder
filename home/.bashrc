@@ -12,3 +12,11 @@ alias more='less'
 
 # everyone wants to start here anyway
 [ -d "/data/openpilot" ] && cd /data/openpilot
+
+# mathlib 
+export MATHLIB="m"
+
+# shit
+if [ -f data/data/com.termux/files/usr/lib/libOpenCL.so ]; then
+  export LD_PRELOAD=$LD_PRELOAD:/data/data/com.termux/files/usr/lib/libOpenCL.so
+fi

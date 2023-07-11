@@ -208,6 +208,7 @@ if __name__ == "__main__":
         'binutils',
         'binutils-libs',
         'binutils-bin',
+        'gnupg'
     ]
 
     pkg_deps, pkg_filenames = load_packages()

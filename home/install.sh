@@ -24,6 +24,11 @@ fi
 # prevent apt from updating
 echo "apt hold" | dpkg --set-selections
 
+#its pointless
+wget https://its-pointless.github.io/pointless.gpg
+apt-key add pointless.gpg
+apt update
+
 # setup the env
 apt-get update
 apt-get install gawk findutils
@@ -49,9 +54,13 @@ if [ $SET_STAGE -lt 1 ]; then
   # tur repo
   apt install -y tur-repo
 
-  # -------- GCC
-  # mkdir gcc
-  # pushd gcc
+  apt install -y ndk-sysroot
+  apt install -y ocl-icd opencl-headers opencl-clhpp clinfo
+
+  # export CC=/usr/bin/aarch64-linux-android-gcc
+
+  # apt install libandroid-execinfo
+  # export LDFLAGS="-lpython3.11"
 
   # BINUTILS=binutils-2.32
   # GCC=gcc-4.7.1
@@ -79,19 +88,23 @@ if [ $SET_STAGE -lt 1 ]; then
   # make install
   # popd
 
+  # -------- GCC
+  # mkdir gcc
+  # pushd gcc
+
   # mkdir -p src
   # pushd src
-  # wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/$GCC/$GCC.tar.bz2
-  # tar -xf $GCC.tar.bz2
-  # cd $GCC
+  # wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/gcc-4.7.1/gcc-4.7.1.tar.bz2
+  # tar -xf gcc-4.7.1.tar.bz2
+  # cd gcc-4.7.1
   # contrib/download_prerequisites
   # popd
 
   # export PATH="$PREFIX/bin:$PATH"
 
-  # mkdir -p build/$GCC
-  # pushd build/$GCC
-  # ../../src/$GCC/configure --target=arm-none-eabi \
+  # mkdir -p build/gcc-4.7.1
+  # pushd build/gcc-4.7.1
+  # ../../src/gcc-4.7.1/configure --target=arm-none-eabi \
   #   --build=aarch64-unknown-linux-gnu \
   #   --disable-libssp --disable-gomp --disable-libstcxx-pch --enable-threads \
   #   --disable-shared --disable-libmudflap \
@@ -107,6 +120,8 @@ if [ $SET_STAGE -lt 1 ]; then
 
   apt install -y gcc-9
   apt install -y binutils
+
+  apt install -y lfortran libgfortran5 libandroid-complex-math
 
   echo "2" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=1
@@ -204,14 +219,22 @@ if [ $SET_STAGE -lt 7 ]; then
   SET_STAGE=7
 fi
 if [ $SET_STAGE -lt 8 ]; then
+
+  # flags needed for numpy and others
+  export CFLAGS=-Wno-implicit-function-declaration
+  export LD_PRELOAD=${LD_PRELOAD}:/data/data/com.termux/files/usr/lib/libOpenCL.so
+  export CMAKE_CXX_FLAGS=-fuse-ld=ldd
+
   # ------- python packages
   cd $HOME
   export PYCURL_SSL_LIBRARY=openssl
+
   # pip install --no-cache-dir --upgrade pip
   # pip install --no-cache-dir pipenv
   # pipenv install --deploy --system --verbose --clear
-  # numpy and scipy
-  apt install -y python-numpy python-scipy
+  # scipy
+  apt install -y python-scipy
+  apt install -y ninja
   pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=8
@@ -254,12 +277,19 @@ if [ $SET_STAGE -lt 10 ]; then
   # cmake ../opencv -DCMAKE_CXX_FLAGS="-llog" 
   # make -j4
   # make install
+
+  # ------- tinygrad
+  git clone https://github.com/geohot/tinygrad.git
+  cd tinygrad
+  python3 -m pip install -e .
+
   echo "11" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=10
 fi
 
 if [ $SET_STAGE -lt 11 ]; then
-  echo "\n\nInstall successful\nTook $SECONDS seconds" > /data/data/com.termux/files/retros_setup_complete
+  echo "\n\nInstall successful\nTook $SECONDS seconds"
+  touch /data/data/com.termux/files/retros_setup_complete
   echo "12" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=11
 fi

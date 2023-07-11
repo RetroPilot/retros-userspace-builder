@@ -222,7 +222,9 @@ if [ $SET_STAGE -lt 8 ]; then
 
   # flags needed for numpy and others
   export CFLAGS=-Wno-implicit-function-declaration
-  export LD_PRELOAD=${LD_PRELOAD}:/data/data/com.termux/files/usr/lib/libOpenCL.so
+  # export LD_PRELOAD=${LD_PRELOAD}:/data/data/com.termux/files/usr/lib/libOpenCL.so
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/system/vendor/lib64:/system/lib64
+  export LD_PRELOAD=${LD_PRELOAD}:/vendor/lib64/libOpenCL.so
   export CMAKE_CXX_FLAGS=-fuse-ld=ldd
 
   # ------- python packages
@@ -232,9 +234,20 @@ if [ $SET_STAGE -lt 8 ]; then
   # pip install --no-cache-dir --upgrade pip
   # pip install --no-cache-dir pipenv
   # pipenv install --deploy --system --verbose --clear
-  # scipy
+
+  # scipy and ninja
   apt install -y python-scipy
   apt install -y ninja
+
+  # pyopencl
+  git clone https://github.com/inducer/pyopencl.git
+  cd pyopencl
+  git checkout 604f709a962de8051bcd8e07d515cc8e90d7bf5c
+  ./configure.py --cl-pretend-version=2.0
+  pip install .
+  cd ..
+
+  # flowpilot reqs
   pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=8

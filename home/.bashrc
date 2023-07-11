@@ -16,7 +16,5 @@ alias more='less'
 # mathlib 
 export MATHLIB="m"
 
-# shit
-if [ -f data/data/com.termux/files/usr/lib/libOpenCL.so ]; then
-  export LD_PRELOAD=$LD_PRELOAD:/data/data/com.termux/files/usr/lib/libOpenCL.so
-fi
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/system/vendor/lib64:/system/lib64
+export LD_PRELOAD=${LD_PRELOAD}:/vendor/lib64/libOpenCL.so

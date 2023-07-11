@@ -36,6 +36,10 @@ then
 ln -s /data/data/com.termux/files/usr /usr
 mkdir -p /tmp && mount -t tmpfs -o size=2048M tmpfs /tmp
 ```
+add libOpenCL.so to /system/etc/public.libraries.txt if you have it in /system/lib64
+```
+echo libOpenCL.so >> /system/etc/public.libraries.txt
+```
 Enter the userspace
 ```
 export HOME=/data/data/com.termux/files/home && export PATH=/data/data/com.termux/files/usr/bin:/bin && export LD_LIBRARY_PATH=/data/data/com.termux/files/usr/lib:/data/data/com.termux/files/usr/local/lib64 && bash

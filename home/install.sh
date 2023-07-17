@@ -222,10 +222,9 @@ if [ $SET_STAGE -lt 8 ]; then
 
   # flags needed for numpy and others
   export CFLAGS=-Wno-implicit-function-declaration
-  # export LD_PRELOAD=${LD_PRELOAD}:/data/data/com.termux/files/usr/lib/libOpenCL.so
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/system/vendor/lib64:/system/lib64
   export LD_PRELOAD=${LD_PRELOAD}:/vendor/lib64/libOpenCL.so
-  export CMAKE_CXX_FLAGS=-fuse-ld=ldd
+  export CMAKE_CXX_FLAGS=-fuse-ld=lld
 
   # ------- python packages
   cd $HOME
@@ -247,7 +246,10 @@ if [ $SET_STAGE -lt 8 ]; then
   pip install .
   cd ..
 
+  apt install liblmdb
+
   # flowpilot reqs
+  export LMDB_FORCE_SYSTEM=1
   pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=8
@@ -294,6 +296,7 @@ if [ $SET_STAGE -lt 10 ]; then
   # ------- tinygrad
   git clone https://github.com/geohot/tinygrad.git
   cd tinygrad
+  git checkout 64d39188ad22574025eb6534727ed33d699b4348
   python3 -m pip install -e .
 
   echo "11" > /data/data/com.termux/files/home/.install_progress

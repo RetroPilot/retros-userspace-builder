@@ -246,6 +246,7 @@ if [ $SET_STAGE -lt 8 ]; then
   pip install .
   cd ..
 
+  # lmdb lib for flowpilot reqs later
   apt install liblmdb
 
   # flowpilot reqs

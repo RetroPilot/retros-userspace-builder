@@ -1,3 +1,2 @@
 out
-files.tar.xz
-files.tar.gz
+*.tar.gz

@@ -295,9 +295,9 @@ if [ $SET_STAGE -lt 10 ]; then
   # make install
 
   # ------- tinygrad
-  git clone https://github.com/geohot/tinygrad.git
+  git clone https://github.com/tinygrad/tinygrad.git
   cd tinygrad
-  git checkout 64d39188ad22574025eb6534727ed33d699b4348
+  git checkout 34f348643b926b27c0da5d7c63be62f18638eeff
   python3 -m pip install -e .
 
   echo "11" > /data/data/com.termux/files/home/.install_progress

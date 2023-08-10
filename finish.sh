@@ -22,5 +22,12 @@ cp -pRv home out/data/data/com.termux/files/
 mkdir -p out/data/data/com.termux/files/usr/libexec/qt/egldeviceintegrations/
 cp libqeglfs-surfaceflinger-integration.so
 cd out/data/data/com.termux/
-tar czvf userspace.tar.gz files
-mv userspace.tar.gz ../../../../
+
+if [[ $RETROS == 1 ]]; then
+  #tar cvJf files.tar.xz files
+  tar -c -v -I 'xz -9 -T0' -f files.tar.xz files
+  mv files.tar.xz ../../../../
+else
+  tar czvf userspace.tar.gz files
+  mv userspace.tar.gz ../../../../
+fi

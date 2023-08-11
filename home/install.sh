@@ -27,6 +27,7 @@ echo "apt hold" | dpkg --set-selections
 #its pointless
 wget https://its-pointless.github.io/pointless.gpg
 apt-key add pointless.gpg
+rm pointless.gpg
 apt update
 
 # setup the env
@@ -240,6 +241,7 @@ if [ $SET_STAGE -lt 8 ]; then
 
   # pyopencl
   export MATHLIB="m"
+  cd /tmp/build
   git clone https://github.com/inducer/pyopencl.git
   cd pyopencl
   git checkout 604f709a962de8051bcd8e07d515cc8e90d7bf5c
@@ -252,6 +254,7 @@ if [ $SET_STAGE -lt 8 ]; then
 
   # flowpilot reqs
   export LMDB_FORCE_SYSTEM=1
+  cd /data/data/com.termux/files/home/
   pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=8

@@ -239,6 +239,7 @@ if [ $SET_STAGE -lt 8 ]; then
   apt install -y ninja
 
   # pyopencl
+  export MATHLIB="m"
   git clone https://github.com/inducer/pyopencl.git
   cd pyopencl
   git checkout 604f709a962de8051bcd8e07d515cc8e90d7bf5c

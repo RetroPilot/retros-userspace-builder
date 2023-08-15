@@ -18,3 +18,7 @@ export MATHLIB="m"
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/system/vendor/lib64:/system/lib64
 export LD_PRELOAD=${LD_PRELOAD}:/vendor/lib64/libOpenCL.so
+
+RED='\033[0;31m'
+NONE='\033[0m'
+echo -e "Use ${RED}tmux a${NONE} to attach to a session"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+source ~/.bash_profile
+source ~/.bashrc
 
 while true; do
     ping -c 1 8.8.8.8 && break
@@ -21,35 +23,41 @@ then
   mkdir -p /data/data/com.termux/cache/apt/archives/partial
 fi
 
-# prevent apt from updating
-echo "apt hold" | dpkg --set-selections
-
-#its pointless
-wget https://its-pointless.github.io/pointless.gpg
-apt-key add pointless.gpg
-rm pointless.gpg
-apt update
-
-# setup the env
-apt-get update
-apt-get install gawk findutils
-chmod 644 /data/data/com.termux/files/home/.ssh/config
-chown root:root /data/data/com.termux/files/home/.ssh/config
-
-# Execute all apt postinstall scripts
-chmod +x /usr/var/lib/dpkg/info/*.postinst
-find /usr/var/lib/dpkg/info -type f  -executable -exec sh -c 'exec "$1"' _ {} \;
-chmod +x /usr/var/lib/dpkg/info/*.prerm
-
+# clear and remake the build dir
 if [ -d "/tmp/build" ] 
 then
   rm -rf /tmp/build/
 fi
-
 mkdir /tmp/build
 cd /tmp/build
 
 if [ $SET_STAGE -lt 1 ]; then
+  # prevent apt from updating
+  echo "apt hold" | dpkg --set-selections
+
+  #its pointless
+  wget https://its-pointless.github.io/pointless.gpg
+  apt-key add pointless.gpg
+  rm pointless.gpg
+  apt update
+
+  # setup the env
+  apt-get update
+  apt-get install gawk findutils
+  chmod 644 /data/data/com.termux/files/home/.ssh/config
+  chown root:root /data/data/com.termux/files/home/.ssh/config
+
+  # Execute all apt postinstall scripts
+  chmod +x /usr/var/lib/dpkg/info/*.postinst
+  find /usr/var/lib/dpkg/info -type f  -executable -exec sh -c 'exec "$1"' _ {} \;
+  chmod +x /usr/var/lib/dpkg/info/*.prerm
+
+  echo "1" > /data/data/com.termux/files/home/.install_progress
+  SET_STAGE=1
+
+fi
+
+if [ $SET_STAGE -lt 2 ]; then
 
   # new apt stuff
   # tur repo
@@ -57,83 +65,19 @@ if [ $SET_STAGE -lt 1 ]; then
 
   apt install -y ndk-sysroot
   apt install -y ocl-icd opencl-headers opencl-clhpp clinfo
-
+  
   # export CC=/usr/bin/aarch64-linux-android-gcc
 
   # apt install libandroid-execinfo
   # export LDFLAGS="-lpython3.11"
 
-  # BINUTILS=binutils-2.32
-  # GCC=gcc-4.7.1
-  # PREFIX=/usr
-
-  # mkdir src
-  # pushd src
-  # wget --tries=inf ftp://ftp.gnu.org/gnu/binutils/$BINUTILS.tar.bz2
-  # tar -xf $BINUTILS.tar.bz2
-  # popd
-  
-  # mkdir -p build/$BINUTILS
-  # pushd build/$BINUTILS
-
-  # # hack for binutils
-  # sed -i '1s/^/#define __ANDROID_API__ 28\n/' ../../src/$BINUTILS/bfd/bfdio.c
-
-  # ../../src/$BINUTILS/configure CPPFLAGS="-D__ANDROID_API__=28" --target=arm-none-eabi \
-  #   --build=aarch64-unknown-linux-gnu \
-  #   --prefix=$PREFIX --with-cpu=cortex-m4 \
-  #   --with-mode=thumb \
-  #   --disable-nls \
-  #   --disable-werror
-  # make -j4 all
-  # make install
-  # popd
-
-  # -------- GCC
-  # mkdir gcc
-  # pushd gcc
-
-  # mkdir -p src
-  # pushd src
-  # wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/gcc-4.7.1/gcc-4.7.1.tar.bz2
-  # tar -xf gcc-4.7.1.tar.bz2
-  # cd gcc-4.7.1
-  # contrib/download_prerequisites
-  # popd
-
-  # export PATH="$PREFIX/bin:$PATH"
-
-  # mkdir -p build/gcc-4.7.1
-  # pushd build/gcc-4.7.1
-  # ../../src/gcc-4.7.1/configure --target=arm-none-eabi \
-  #   --build=aarch64-unknown-linux-gnu \
-  #   --disable-libssp --disable-gomp --disable-libstcxx-pch --enable-threads \
-  #   --disable-shared --disable-libmudflap \
-  #   --prefix=$PREFIX --with-cpu=cortex-m4 \
-  #   --with-mode=thumb --disable-multilib \
-  #   --enable-interwork \
-  #   --enable-languages="c" \
-  #   --disable-nls \
-  #   --disable-libgcc
-  # make -j4 all-gcc
-  # make install-gcc
-  # popd
-
-  apt install -y gcc-9
-  apt install -y binutils
-
   apt install -y lfortran libgfortran5 libandroid-complex-math
 
   echo "2" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=1
+  SET_STAGE=2
 fi
 
-if [ $SET_STAGE -lt 2 ]; then
-  # replace stdint.h with stdint-gcc.h for Android compatibility
-  # mv $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint-gcc.h $PREFIX/lib/gcc/arm-none-eabi/4.7.1/include/stdint.h
-
-  # popd
-
+if [ $SET_STAGE -lt 3 ]; then
   # -------- capnproto
   # VERSION=0.8.0
 
@@ -147,10 +91,10 @@ if [ $SET_STAGE -lt 2 ]; then
   # popd
   apt install capnproto
   echo "3" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=2
+  SET_STAGE=3
 fi
 
-if [ $SET_STAGE -lt 3 ]; then
+if [ $SET_STAGE -lt 4 ]; then
   # ---- Eigen
   wget --tries=inf https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.bz2
   mkdir eigen
@@ -162,10 +106,10 @@ if [ $SET_STAGE -lt 3 ]; then
   make install
   popd
   echo "4" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=3
+  SET_STAGE=4
 fi
 
-if [ $SET_STAGE -lt 4 ]; then
+if [ $SET_STAGE -lt 5 ]; then
   # --- Libusb
   wget --tries=inf https://github.com/libusb/libusb/releases/download/v1.0.22/libusb-1.0.22.tar.bz2
   tar xjf libusb-1.0.22.tar.bz2
@@ -175,10 +119,10 @@ if [ $SET_STAGE -lt 4 ]; then
   make install
   popd
   echo "5" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=4
+  SET_STAGE=5
 fi
 
-if [ $SET_STAGE -lt 5 ]; then
+if [ $SET_STAGE -lt 6 ]; then
   # ------- tcpdump
   # VERSION="4.9.2"
   # wget --tries=inf https://www.tcpdump.org/release/tcpdump-$VERSION.tar.gz
@@ -190,10 +134,10 @@ if [ $SET_STAGE -lt 5 ]; then
   # popd
   apt install tcpdump
   echo "6" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=5
+  SET_STAGE=6
 fi
 
-if [ $SET_STAGE -lt 6 ]; then
+if [ $SET_STAGE -lt 7 ]; then
   # ----- DFU util 0.8
   wget --tries=inf http://dfu-util.sourceforge.net/releases/dfu-util-0.8.tar.gz
   tar xvf dfu-util-0.8.tar.gz
@@ -203,10 +147,10 @@ if [ $SET_STAGE -lt 6 ]; then
   make install
   popd
   echo "7" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=6
+  SET_STAGE=7
 fi
 
-if [ $SET_STAGE -lt 7 ]; then
+if [ $SET_STAGE -lt 8 ]; then
   # ----- Nload
   wget --tries=inf -O nload-v0.7.4.tar.gz https://github.com/rolandriegel/nload/archive/v0.7.4.tar.gz
   tar xvf nload-v0.7.4.tar.gz
@@ -217,49 +161,53 @@ if [ $SET_STAGE -lt 7 ]; then
   make install
   popd
   echo "8" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=7
+  SET_STAGE=8
 fi
-if [ $SET_STAGE -lt 8 ]; then
+
+if [ $SET_STAGE -lt 9 ]; then
 
   # flags needed for numpy and others
   export CFLAGS=-Wno-implicit-function-declaration
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/system/vendor/lib64:/system/lib64
-  export LD_PRELOAD=${LD_PRELOAD}:/vendor/lib64/libOpenCL.so
   export CMAKE_CXX_FLAGS=-fuse-ld=lld
-
-  # ------- python packages
-  cd $HOME
   export PYCURL_SSL_LIBRARY=openssl
 
+  # ------- python packages
   # pip install --no-cache-dir --upgrade pip
   # pip install --no-cache-dir pipenv
   # pipenv install --deploy --system --verbose --clear
+
+  pip install setuptools
+  pip install Cython==3.0.0
+  apt install -y gcc-11 gcc-default-11
+
+  # pyopencl
+  export MATHLIB="m"
+  cd /tmp/build
+  git clone https://github.com/RetroPilot/pyopencl
+  cd pyopencl
+  ./configure.py --cl-pretend-version=2.0
+  pip install .
+  cd ..
 
   # scipy and ninja
   apt install -y python-scipy
   apt install -y ninja
 
-  # pyopencl
-  export MATHLIB="m"
-  cd /tmp/build
-  git clone https://github.com/inducer/pyopencl.git
-  cd pyopencl
-  git checkout 604f709a962de8051bcd8e07d515cc8e90d7bf5c
-  ./configure.py --cl-pretend-version=2.0
-  pip install .
-  cd ..
-
   # lmdb lib for flowpilot reqs later
-  apt install liblmdb
+  apt install -y liblmdb
+
+  # rust needed for panda reqs
+  apt install -y rust
 
   # flowpilot reqs
   export LMDB_FORCE_SYSTEM=1
   cd /data/data/com.termux/files/home/
   pip install -r requirements.txt
   echo "9" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=8
+  SET_STAGE=9
 fi
-if [ $SET_STAGE -lt 9 ]; then
+
+if [ $SET_STAGE -lt 10 ]; then
   # ------- casadi
   cd /tmp/build
   git clone https://github.com/casadi/casadi.git
@@ -284,12 +232,12 @@ if [ $SET_STAGE -lt 9 ]; then
   python -c "from casadi import *"
   popd
   echo "10" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=9
+  SET_STAGE=10
 fi
 
-if [ $SET_STAGE -lt 10 ]; then
+if [ $SET_STAGE -lt 11 ]; then
   # ------- OpenCV
-  # cd /tmp/build
+  cd /tmp/build
   # git clone https://github.com/opencv/opencv.git
   # git -C opencv checkout 4.x
   # mkdir -p build 
@@ -303,14 +251,96 @@ if [ $SET_STAGE -lt 10 ]; then
   cd tinygrad
   git checkout 34f348643b926b27c0da5d7c63be62f18638eeff
   python3 -m pip install -e .
+  cd ..
 
   echo "11" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=10
+  SET_STAGE=11
 fi
 
-if [ $SET_STAGE -lt 11 ]; then
-  echo "\n\nInstall successful\nTook $SECONDS seconds"
-  touch /data/data/com.termux/files/retros_setup_complete
+if [ $SET_STAGE -lt 12 ]; then
+
+  export TERMUX_MAIN_PACKAGE_FORMAT=debian
+
+  apt install -y gcc-11 gcc-default-11 texinfo
+
+  # -------- binutils
+  BINUTILS=binutils-2.41
+  # PREFIX=/usr
+
+  mkdir binutils
+  cd binutils
+
+  mkdir src
+  pushd src
+  wget --tries=inf ftp://ftp.gnu.org/gnu/binutils/$BINUTILS.tar.bz2
+  tar -xf $BINUTILS.tar.bz2
+  popd
+  
+  mkdir -p build/$BINUTILS
+  pushd build/$BINUTILS
+
+  # hack for binutils
+  sed -i '1s/^/#define __ANDROID_API__ 30\n/' ../../src/$BINUTILS/bfd/bfdio.c
+
+  ../../src/$BINUTILS/configure CPPFLAGS="-D__ANDROID_API__=30" --target=arm-none-eabi \
+    --build=aarch64-unknown-linux-gnu \
+    --prefix=$PREFIX --with-cpu=cortex-m7 \
+    --with-mode=thumb \
+    --disable-nls \
+    --disable-werror
+  make -j4 all
+  make install
+  popd
+
+  # -------- GCC
+  GCC=gcc-11.4.0
+
+  mkdir gcc
+  pushd gcc
+
+  mkdir -p src
+  pushd src
+  wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/$GCC/$GCC.tar.gz
+  tar -xvf $GCC.tar.gz
+  cd $GCC
+  contrib/download_prerequisites
+  popd
+
+  export PATH="$PREFIX/bin:$PATH"
+
+  mkdir -p build/$GCC
+  pushd build/$GCC
+
+  # surgery to that one file to make compile crocodile
+  # ../../src/gcc-11.4.0/libcpp/system.h
+  # ../../src/gcc-11.4.0/gcc/system.h
+  sed -i '/\#include <stdio.h>/a static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }\n' ../../src/$GCC/libcpp/system.h
+  sed -i '/\#include <stdio.h>/a static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }\n' ../../src/$GCC/gcc/system.h
+  # static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }
+
+  ../../src/$GCC/configure --target=arm-none-eabi \
+    --build=aarch64-unknown-linux-gnu \
+    --disable-libssp --disable-gomp --disable-libstcxx-pch --enable-threads \
+    --disable-shared --disable-libmudflap \
+    --prefix=$PREFIX --with-cpu=cortex-m7 \
+    --with-mode=thumb --disable-multilib \
+    --enable-interwork \
+    --enable-languages="c" \
+    --disable-nls \
+    --disable-libgcc
+  CFLAGS="-fPIE" make -j4 all-gcc
+  make install-gcc
+  popd
+
+  # replace stdint.h with stdint-gcc.h for Android compatibility
+  mv $PREFIX/lib/gcc/arm-none-eabi/11.4.0/include/stdint-gcc.h $PREFIX/lib/gcc/arm-none-eabi/11.4.0/include/stdint.h
+
   echo "12" > /data/data/com.termux/files/home/.install_progress
-  SET_STAGE=11
+  SET_STAGE=12
+fi
+
+if [ $SET_STAGE -lt 13 ]; then
+  echo "\n\nInstall successful\nTook $SECONDS seconds" > /data/data/com.termux/files/retros_setup_complete
+  echo "13" > /data/data/com.termux/files/home/.install_progress
+  SET_STAGE=13
 fi

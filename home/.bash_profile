@@ -20,3 +20,13 @@ export MYVIMRC="/data/data/com.termux/files/home/.vimrc"
 
 # Disable history writing
 export PYTHONSTARTUP="/data/data/com.termux/files/home/.pythonrc"
+
+# Termux package type
+export TERMUX_MAIN_PACKAGE_FORMAT=debian
+
+# mathlib 
+export MATHLIB="m"
+
+# libraries
+export LD_LIBRARY_PATH=/data/data/com.termux/files/usr/lib:/data/data/com.termux/files/usr/local/lib64:/system/vendor/lib64:/system/lib64:
+export LD_PRELOAD=/data/data/com.termux/files/usr/lib/libtermux-exec.so:/vendor/lib64/libOpenCL.so:

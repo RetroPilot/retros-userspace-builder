@@ -237,7 +237,7 @@ fi
 
 if [ $SET_STAGE -lt 11 ]; then
   # ------- OpenCV
-  cd /tmp/build
+  # cd /tmp/build
   # git clone https://github.com/opencv/opencv.git
   # git -C opencv checkout 4.x
   # mkdir -p build 
@@ -247,6 +247,7 @@ if [ $SET_STAGE -lt 11 ]; then
   # make install
 
   # ------- tinygrad
+  cd /tmp/build
   git clone https://github.com/tinygrad/tinygrad.git
   cd tinygrad
   git checkout 34f348643b926b27c0da5d7c63be62f18638eeff
@@ -265,17 +266,14 @@ if [ $SET_STAGE -lt 12 ]; then
 
   # -------- binutils
   BINUTILS=binutils-2.41
-  # PREFIX=/usr
-
+  cd /tmp/build
   mkdir binutils
   cd binutils
-
   mkdir src
   pushd src
   wget --tries=inf ftp://ftp.gnu.org/gnu/binutils/$BINUTILS.tar.bz2
   tar -xf $BINUTILS.tar.bz2
   popd
-  
   mkdir -p build/$BINUTILS
   pushd build/$BINUTILS
 
@@ -294,10 +292,10 @@ if [ $SET_STAGE -lt 12 ]; then
 
   # -------- GCC
   GCC=gcc-11.4.0
-
+  export PATH="$PREFIX/bin:$PATH"
+  cd /tmp/build
   mkdir gcc
   pushd gcc
-
   mkdir -p src
   pushd src
   wget --tries=inf ftp://ftp.gnu.org/gnu/gcc/$GCC/$GCC.tar.gz
@@ -305,18 +303,12 @@ if [ $SET_STAGE -lt 12 ]; then
   cd $GCC
   contrib/download_prerequisites
   popd
-
-  export PATH="$PREFIX/bin:$PATH"
-
   mkdir -p build/$GCC
   pushd build/$GCC
 
-  # surgery to that one file to make compile crocodile
-  # ../../src/gcc-11.4.0/libcpp/system.h
-  # ../../src/gcc-11.4.0/gcc/system.h
+  # hacks that allow gcc to compile
   sed -i '/\#include <stdio.h>/a static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }\n' ../../src/$GCC/libcpp/system.h
   sed -i '/\#include <stdio.h>/a static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }\n' ../../src/$GCC/gcc/system.h
-  # static inline int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }
 
   ../../src/$GCC/configure --target=arm-none-eabi \
     --build=aarch64-unknown-linux-gnu \

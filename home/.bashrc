@@ -11,7 +11,10 @@ alias gsu='git submodule update'
 alias more='less'
 
 # everyone wants to start here anyway
-[ -d "/data/openpilot" ] && cd /data/openpilot
+if [ -d "/data/flowpilot" ]; then
+  export PYTHONPATH=/data/flowpilot
+  cd /data/flowpilot
+fi
 
 RED='\033[0;31m'
 NONE='\033[0m'

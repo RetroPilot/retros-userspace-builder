@@ -4,7 +4,7 @@ cffi==1.15.1
 cfgv==3.3.1
 charset-normalizer==3.2.0
 crcmod==1.7
-Cython==3.0.0
+Cython==0.29.36
 dill==0.3.6
 distlib==0.3.7
 filelock==3.12.2
@@ -39,7 +39,6 @@ requests==2.31.0
 screen-brightness-control==0.21.0
 tomlkit==0.11.8
 tqdm==4.65.0
-urllib3==2.0.3
 virtualenv==20.24.0
 wrapt==1.15.0
 ruff==0.0.282
@@ -50,3 +49,12 @@ pytest-timeouts
 flaky
 spidev
 scons
+atomicwrites==1.4.1
+pycurl==7.45.1
+sentry-sdk==1.10.1
+boto3==1.26.113
+pyserial
+smbus2==0.4.2
+sympy==1.11.1
+jwt
+setproctitle

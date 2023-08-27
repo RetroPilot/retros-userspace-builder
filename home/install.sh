@@ -275,7 +275,8 @@ if [ $SET_STAGE -lt 11 ]; then
   # -------- GCC
   GCC=gcc-11.4.0
   export PATH="$PREFIX/bin:$PATH"
-  cd /tmp/build
+  # GCC takes 6GB, so don't build it in tmp (2GB)
+  cd /data/data/com.termux/files/home
   mkdir gcc
   pushd gcc
   mkdir -p src
@@ -302,9 +303,13 @@ if [ $SET_STAGE -lt 11 ]; then
     --enable-languages="c" \
     --disable-nls \
     --disable-libgcc
-  CFLAGS="-fPIE" make -j4 all-gcc
+  CFLAGS="-fPIE" 
+  make -j4 all-gcc
   make install-gcc
   popd
+  # cleanup
+  cd /data/data/com.termux/files/home
+  rm -rf gcc
 
   # replace stdint.h with stdint-gcc.h for Android compatibility
   mv $PREFIX/lib/gcc/arm-none-eabi/11.4.0/include/stdint-gcc.h $PREFIX/lib/gcc/arm-none-eabi/11.4.0/include/stdint.h
@@ -315,6 +320,7 @@ fi
 
 if [ $SET_STAGE -lt 12 ]; then
   # -------- capnproto
+  cd /tmp/build
   VERSION=0.8.0
 
   wget --tries=inf https://capnproto.org/capnproto-c++-${VERSION}.tar.gz
@@ -326,8 +332,7 @@ if [ $SET_STAGE -lt 12 ]; then
   make -j4 install
   popd
 
-  # apt install capnproto
-
+  # -------- pycapnp
   cd /tmp/build
   git clone https://github.com/capnproto/pycapnp.git
   cd pycapnp
@@ -337,6 +342,9 @@ if [ $SET_STAGE -lt 12 ]; then
 
   # extras
   apt install -y libzmq
+
+  # cleanup
+  rm -rf /tmp/build
 
   echo "12" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=12

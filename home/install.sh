@@ -86,7 +86,7 @@ if [ $SET_STAGE -lt 3 ]; then
   mkdir build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-  make install
+  make -j$(nproc) install
   popd
   echo "3" > /data/data/com.termux/files/home/.install_progress
   SET_STAGE=3
@@ -98,7 +98,7 @@ if [ $SET_STAGE -lt 4 ]; then
   tar xjf libusb-1.0.22.tar.bz2
   pushd libusb-1.0.22
   ./configure --prefix=/usr --disable-udev
-  make -j4
+  make -j$(nproc)
   make install
   popd
   echo "4" > /data/data/com.termux/files/home/.install_progress
@@ -112,7 +112,7 @@ if [ $SET_STAGE -lt 5 ]; then
   # tar xvf tcpdump-$VERSION.tar.gz
   # pushd tcpdump-$VERSION
   # ./configure --prefix=/usr
-  # make -j4
+  # make -j$(nproc)
   # make install
   # popd
   apt install tcpdump
@@ -126,7 +126,7 @@ if [ $SET_STAGE -lt 6 ]; then
   tar xvf dfu-util-0.8.tar.gz
   pushd dfu-util-0.8
   ./configure --prefix=/usr
-  make -j4
+  make -j$(nproc)
   make install
   popd
   echo "6" > /data/data/com.termux/files/home/.install_progress
@@ -140,7 +140,7 @@ if [ $SET_STAGE -lt 7 ]; then
   pushd nload-0.7.4
   bash run_autotools
   ./configure --prefix=/usr
-  make -j4
+  make -j$(nproc)
   make install
   popd
   echo "7" > /data/data/com.termux/files/home/.install_progress
@@ -210,7 +210,7 @@ if [ $SET_STAGE -lt 9 ]; then
         -DLIB_PREFIX=/usr/lib \
         -DINCLUDE_PREFIX=/usr/include \
         ..
-  make -j4
+  make -j$(nproc)
   make install
   rm -rf /usr/local/
   python -c "from casadi import *"
@@ -227,7 +227,7 @@ if [ $SET_STAGE -lt 10 ]; then
   # mkdir -p build 
   # cd build
   # cmake ../opencv -DCMAKE_CXX_FLAGS="-llog" 
-  # make -j4
+  # make -j$(nproc)
   # make install
 
   # ------- tinygrad
@@ -268,7 +268,7 @@ if [ $SET_STAGE -lt 11 ]; then
     --with-mode=thumb \
     --disable-nls \
     --disable-werror
-  make -j4 all
+  make -j$(nproc) all
   make install
   popd
 
@@ -304,7 +304,7 @@ if [ $SET_STAGE -lt 11 ]; then
     --disable-nls \
     --disable-libgcc
   CFLAGS="-fPIE" 
-  make -j4 all-gcc
+  make -j$(nproc) all-gcc
   make install-gcc
   popd
   # cleanup
@@ -329,7 +329,7 @@ if [ $SET_STAGE -lt 12 ]; then
   pushd capnproto-c++-${VERSION}
 
   CXXFLAGS="-fPIC -O2" ./configure --prefix=/usr
-  make -j4 install
+  make -j$(nproc) install
   popd
 
   # -------- pycapnp
